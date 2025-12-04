@@ -6,9 +6,12 @@ import { Textarea } from '../ui/textarea'
 import { Button } from '../ui/button'
 import { v4 as uuidv4 } from 'uuid'
 import { toast } from 'sonner'
+import { Flag } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export default function FormBuilder() {
-
+  const router  = useRouter();
+const [isSubmiting,setIsSubmiting] = useState(false)
     const [form,setForm] = useState({
 
         title:"",
@@ -47,9 +50,35 @@ export default function FormBuilder() {
 
     }
 
-    const handelSubmit =( e:FormEvent) =>{
+    const handelSubmit = async( e:FormEvent) =>{
 
       e.preventDefault();
+
+      //validate form 
+      if(!form.title.trim()){
+
+        toast.error("Title is required")
+        return
+      }
+
+      const emptyQuestion = form.questions.some((q)=>!q.text.trim());
+      if(emptyQuestion){
+           toast.error("All questions must have text");
+           return
+      }
+
+      try{
+        setIsSubmiting(true)
+
+        // delay 
+        await new Promise((resolve)=> setTimeout(resolve,2000));
+
+        
+      }catch{
+
+      }finally{
+        setIsSubmiting(false)
+      }
 
     }
   return (
@@ -110,9 +139,9 @@ export default function FormBuilder() {
 
       <div className='flex justify-end gao-2'>
 
-        <Button type='button' variant="outline" onClick={()=>{}}> Cancel </Button>
+        <Button type='button' variant="outline" onClick={()=>router.back()} disabled={isSubmiting}> Cancel </Button>
 
-        <Button type='submit'>Save</Button>
+        <Button type='submit'disabled={isSubmiting}>{isSubmiting ? "Saving...":"Create Form"}</Button>
       </div>
     </form>
   );
